@@ -35,8 +35,10 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
+    char local_hostname[BUFF_SIZE];
+    gethostname(local_hostname,BUFF_SIZE-1);
     char client_ip[100];
-    if(host_lookup("localhost",client_ip) < 0){
+    if(host_lookup(local_hostname,client_ip) < 0){
         perror("Error in host lookup");
         exit(EXIT_FAILURE);
     }
