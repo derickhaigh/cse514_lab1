@@ -94,11 +94,11 @@ int main(int argc, char* argv[]){
     }*/
 
     //Start to listen
-    if(listen(server_fd, 3)<0){
+    if(listen(sfd, 3)<0){
         perror("Listen failed");
         exit(EXIT_FAILURE);
     }
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address,(socklen_t*)&addrlen))<0){
+    if ((new_socket = accept(sfd, (struct sockaddr *)&address,(socklen_t*)&addrlen))<0){
         perror("Accept failed");
         exit(EXIT_FAILURE);
     }
