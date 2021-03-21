@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
     }
 
     char client_ip[100];
-    if(host_lookup(hostname,client_ip) < 0){
+    if(host_lookup("localhost",client_ip) < 0){
         perror("Error in host lookup");
         exit(EXIT_FAILURE);
     }
