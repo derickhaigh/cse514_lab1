@@ -21,7 +21,26 @@
 
 int main(int argc, char const *argv[]) 
 { 
+    int choice;
 
+    while(true){
+        choice=menu_prompt();
+        send_message(SERVER_HOSTNAME,PORT,"Test message");
+    }
+    return 0; 
+} 
+
+int menu_prompt(){
+    int choice = 0;
+    while(choice < 1 && choice > 3){
+        printf("1) List Available Files\n2) Download File\n3) View Active Downloads\n");
+        scanf("%d",&choice);
+        printf("\n\n");
+    }
+    return choice;
+}
+
+int send_message(char* target_host, uint16_t port, char* message){
     int sock = 0, valread; 
     struct sockaddr_in serv_addr;     
     char *hello = "Hello from client"; 
@@ -60,9 +79,9 @@ int main(int argc, char const *argv[])
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
-    send(sock , local_hostname , strlen(local_hostname) , 0 ); 
+    send(sock , local_hostname, strlen(local_hostname) , 0 ); 
     printf("Hello message sent\n"); 
     valread = read( sock , buffer, 1024); 
     printf("%s\n",buffer ); 
-    return 0; 
-} 
+    return 0;
+}
