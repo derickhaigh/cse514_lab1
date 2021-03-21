@@ -79,3 +79,5 @@ struct file_chunk_request{
 struct file_chunk_reply{
     void* chunk_buffer;
 };
+
+int requestHandler(int client_fd);

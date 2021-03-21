@@ -28,3 +28,4 @@ client/P2P_client.cpp.321r.dfinish
 client/P2P_client
 .vscode/launch.json
 .vscode/tasks.json
+server/srver.out
