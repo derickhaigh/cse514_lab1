@@ -37,11 +37,6 @@ int main(int argc, char const *argv[])
 
     char local_hostname[BUFF_SIZE];
     gethostname(local_hostname,BUFF_SIZE-1);
-    char client_ip[100];
-    if(host_lookup(local_hostname,client_ip) < 0){
-        perror("Error in host lookup");
-        exit(EXIT_FAILURE);
-    }
 
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
@@ -65,7 +60,7 @@ int main(int argc, char const *argv[])
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
-    send(sock , client_ip , strlen(client_ip) , 0 ); 
+    send(sock , local_hostname , strlen(local_hostname) , 0 ); 
     printf("Hello message sent\n"); 
     valread = read( sock , buffer, 1024); 
     printf("%s\n",buffer ); 
