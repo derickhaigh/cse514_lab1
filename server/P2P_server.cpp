@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     char *hello = "Hello from server";
 
     //Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_DGRAM,0)) == 0){
+    if ((server_fd = socket(AF_INET, SOCK_STREAM,0)) == 0){
         perror("Socket failed");
         exit(EXIT_FAILURE);
     }

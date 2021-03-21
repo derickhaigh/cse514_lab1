@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
     }
 
 
-    if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     { 
         printf("\n Socket creation error \n"); 
         return -1; 
