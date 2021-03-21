@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 { 
 
     int sock = 0, valread; 
-    struct sockaddr_in serv_addr; 
+    struct sockaddr_in serv_addr;     
     char *hello = "Hello from client"; 
     char buffer[BUFF_SIZE] = {0}; 
     
@@ -31,6 +31,12 @@ int main(int argc, char const *argv[])
     char* hostname = SERVER_HOSTNAME;
     char ip[100];
     if(host_lookup(hostname,ip) < 0){
+        perror("Error in host lookup");
+        exit(EXIT_FAILURE);
+    }
+
+    char client_ip[100];
+    if(host_lookup(hostname,client_ip) < 0){
         perror("Error in host lookup");
         exit(EXIT_FAILURE);
     }
@@ -57,7 +63,7 @@ int main(int argc, char const *argv[])
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
-    send(sock , hello , strlen(hello) , 0 ); 
+    send(sock , client_ip , strlen(client_ip) , 0 ); 
     printf("Hello message sent\n"); 
     valread = read( sock , buffer, 1024); 
     printf("%s\n",buffer ); 
