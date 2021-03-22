@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
     
     //Set the message type in the first chunk of the buffer
     *((uint8_t*) curr_entry)=REGISTER;
-
+    curr_entry=&(((uint8_t*) curr_entry)[1]);
 
     //Set requester IP
     *((uint32_t*) curr_entry)=reg_req.requester_ip;
