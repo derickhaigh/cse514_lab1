@@ -87,17 +87,45 @@ int main(int argc, char const *argv[])
     std::cout<<sizeof(std::pair<std::string,uint32_t>)<<std::endl;
     std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size()<<std::endl;
     
-    void* reg_buff = malloc(sizeof(uint8_t)+sizeof(reg_req)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
+    //Create a buffer to hold message
+    //  message_type | requester_ip | requester_port | num_files | array of pairs from the map
+    void* reg_buff = malloc(sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
+    void* curr_entry = reg_buff;
+    
     //Set the message type in the first chunk of the buffer
-    ((uint8_t*) reg_buff)[0]=REGISTER;
+    *((uint8_t*) curr_entry)=REGISTER;
+
+
+    //Set requester IP
+    *((uint32_t*) curr_entry)=reg_req.requester_ip;
+    curr_entry=&(((uint32_t*) curr_entry)[1]);
+
+    //Set requester port
+    *((uint16_t*) curr_entry)=reg_req.requester_port;
+    curr_entry=&(((uint16_t*) curr_entry)[1]);
+
+    //Set number of files
+    *((uint16_t*) curr_entry)=reg_req.num_files;
+    curr_entry=&(((uint16_t*) curr_entry)[1]);
+
+    //Start placing the file name/size pairs
+    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
+        std::cout<<itr->first<<": "<<itr->second<<std::endl;        
+        *((std::string*) curr_entry)=itr->first;
+        curr_entry=&(((std::string*) curr_entry)[1]);
+
+        *((uint32_t*) curr_entry)=itr->second;
+        curr_entry=&(((uint32_t*) curr_entry)[1]);         
+    }
+
 
     //Set a point right after the message type marker
-    void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
+/*    void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
     ((register_request *) reg_buff_msg)[0].num_files=reg_req.num_files;
     ((register_request *) reg_buff_msg)[0].requester_ip=reg_req.requester_ip;
     ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
     ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
-
+*/
     send_message("Server1",8080,(char*)reg_buff);
 
     //Begin the menu loop
