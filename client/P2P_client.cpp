@@ -87,9 +87,15 @@ int main(int argc, char const *argv[])
     std::cout<<sizeof(std::pair<std::string,uint32_t>)<<std::endl;
     std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size()<<std::endl;
     
-    void* reg_buff = malloc(sizeof(reg_req)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
+    void* reg_buff = malloc(sizeof(uint8_t)+sizeof(reg_req)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
+    //Set the message type in the first chunk of the buffer
+    ((uint8_t*) reg_buff)[0]=REGISTER;
 
-    send_message("Server1",8080,reg_buff);
+    //Set a point right after the message type marker
+    void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
+    ((register_request *) reg_buff_msg)[0]=reg_req;
+
+    send_message("Server1",8080,(char*)reg_buff);
 
     //Begin the menu loop
     int choice;
