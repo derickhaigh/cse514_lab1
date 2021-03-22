@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 
     //Get the field of files to register
     char* files=(char*) malloc(sizeof(char) * (strlen(argv[3])+1) );
-
+    strcpy(files,argv[3]);
     //Construct a register message
     //Determine if we have a directory or a list of files
     //If we can open it as a directory it is, otherwise if is
@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
 
 
     closedir(p_dir);
-
+    free(files);
 
     //Debug, iterate through hash table for file entries
 
@@ -74,6 +74,7 @@ int main(int argc, char const *argv[])
         send_message(SERVER_HOSTNAME,PORT,"Test message");
     }
     return 0; 
+
 } 
 
 int menu_prompt(){
