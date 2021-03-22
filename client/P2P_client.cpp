@@ -43,116 +43,10 @@ int main(int argc, char const *argv[])
     //Get the field of files to register
     char* files=(char*) malloc(sizeof(char) * (strlen(argv[3])+1) );
     strcpy(files,argv[3]);
-    //Construct a register message
-    //Determine if we have a directory or a list of files
-    //If we can open it as a directory it is, otherwise if is
-    //either a list of files or invalid
-    struct dirent *p_dirent;
-    DIR *p_dir;
-
-    std::map<std::string,uint32_t> file_registry;
-
-    if((p_dir=opendir(files)) != NULL){
-        //We have a directory, use a recursive function to add entries to function
-        iterate_dir(p_dir,&file_registry,files);
-    
-    }else{
-        //We might have a list of files, iterate through , seperated list and try to get file name and lengths
-    }
 
 
-    closedir(p_dir);
-    free(files);
-
-
-    //Debug, iterate through hash table for file entries
-    std::map<std::string,uint32_t>::iterator itr;
-    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
-        std::cout<<itr->first<<": "<<itr->second<<std::endl;        
-    }
-
-    //Have the file registery, send the message
-    std::cout<<sizeof(file_registry)<<std::endl;
-    register_request reg_req;
-    inet_pton(AF_INET,"127.0.0.1",&reg_req.requester_ip); //need to get actual IP
-    reg_req.requester_port=8080;
-    reg_req.num_files=file_registry.size();
-    reg_req.files_lengths = file_registry;
-    /*std::cout<<sizeof(reg_req)<<std::endl;
-    std::cout<<sizeof(reg_req.files_lengths)<<std::endl;
-    std::cout<<sizeof(std::string)<<std::endl;
-    std::cout<<sizeof(uint32_t)<<std::endl;
-    std::cout<<sizeof(reg_req.num_files)<<std::endl;
-    std::cout<<sizeof(reg_req.requester_ip)<<std::endl;
-    std::cout<<sizeof(reg_req.requester_port)<<std::endl;
-    std::cout<<sizeof(std::pair<std::string,uint32_t>)<<std::endl;
-    std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size()<<std::endl;
-    */
-    //Create a buffer to hold message
-    //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
-    //      1 Byte   | 10 Bytes     | 5 Bytes        |  5 Bytes  | <5 Bytes, num_files Bytes , 5 Bytes>
-    uint32_t reg_buff_size = (21 + 60*reg_req.files_lengths.size());
-    void* reg_buff = malloc(reg_buff_size);
-    void* curr_entry = reg_buff;
-    
-    //To get the buffer to work I'm going to convert values to strings and stor the strings
-    //Set the message type in the first chunk of the buffer
-    
-    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),1);
-    curr_entry=&(((char *) curr_entry)[1]);
-
-    //This seems convoluted and there might be a more elegant way to handle this, but I'm making a padded string and inserting the characters into the buffer
-    //Set requester IP
-    std::string ip_string= std::to_string(reg_req.requester_ip);
-    ip_string = std::string(10-ip_string.size(),'0') + ip_string;
-    std::cout<<ip_string<<std::endl;
-    strncpy((char*)curr_entry,ip_string.c_str(),10);
-    curr_entry=&(((char*) curr_entry)[10]);
-
-    //Set requester port
-    std::string port_string= std::to_string(reg_req.requester_port);
-    port_string = std::string(5-port_string.size(),'0') + port_string;
-    std::cout<<port_string<<std::endl;    
-    strncpy((char*)curr_entry,port_string.c_str(),5);
-    curr_entry=&(((char*) curr_entry)[5]);
-
-    //Set number of files
-    std::string num_files_string= std::to_string(reg_req.num_files);
-    num_files_string = std::string(5-num_files_string.size(),'0') + num_files_string;
-    std::cout<<num_files_string<<std::endl;        
-    strncpy((char*)curr_entry,num_files_string.c_str(),5);
-    curr_entry=&(((char*) curr_entry)[5]);
-
-    //Start placing the file name/size pairs
-    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
-        std::cout<<itr->first<<": "<<itr->second<<std::endl;
-        //Enter size of string
-        uint8_t str_size = itr->first.size();
-        std::string size_string= std::to_string(str_size);
-        size_string = std::string(5-size_string.size(),'0') + size_string;
-        strncpy((char*)curr_entry,size_string.c_str(),5);        
-        curr_entry=&(((char*) curr_entry)[5]);       
-
-        //Cpy str_size chars into buffer
-        //const char* src_str =(char *)&itr->first;        
-        strncpy(((char*) curr_entry),itr->first.c_str(),str_size);
-        curr_entry=&(((char*) curr_entry)[str_size]);
-
-        std::string file_count_string= std::to_string(itr->second);
-        file_count_string = std::string(5-file_count_string.size(),'0') + file_count_string;
-        strncpy((char*)curr_entry,file_count_string.c_str(),5);  
-        curr_entry=&(((char*) curr_entry)[5]);         
-    }
-
-
-    //Set a point right after the message type marker
-/*    void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
-    ((register_request *) reg_buff_msg)[0].num_files=reg_req.num_files;
-    ((register_request *) reg_buff_msg)[0].requester_ip=reg_req.requester_ip;
-    ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
-    ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
-*/
-    send_message("Server1",8080,(char*)reg_buff, reg_buff_size);
+    //Register available files
+    send_reg_req(files, port);
 
     //Begin the menu loop
     int choice;
@@ -254,6 +148,111 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
             }
         }    
     }    
+
+
+}
+
+void send_reg_req(char* files, uint16_t port){
+
+    //Construct a register message
+    //Determine if we have a directory or a list of files
+    //If we can open it as a directory it is, otherwise if is
+    //either a list of files or invalid
+    struct dirent *p_dirent;
+    DIR *p_dir;
+
+    std::map<std::string,uint32_t> file_registry;
+
+    if((p_dir=opendir(files)) != NULL){
+        //We have a directory, use a recursive function to add entries to function
+        iterate_dir(p_dir,&file_registry,files);
+    
+    }else{
+        //We might have a list of files, iterate through , seperated list and try to get file name and lengths
+    }
+
+
+    closedir(p_dir);
+    free(files);
+
+
+    //Debug, iterate through hash table for file entries
+    std::map<std::string,uint32_t>::iterator itr;/*
+    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
+        std::cout<<itr->first<<": "<<itr->second<<std::endl;        
+    }*/
+
+    //Have the file registery, send the message
+    std::cout<<sizeof(file_registry)<<std::endl;
+    register_request reg_req;
+    uint32_t ip;
+    inet_pton(AF_INET,"127.0.0.1",&ip); //need to get actual IP
+
+    //Create a buffer to hold message
+    //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
+    //      1 Byte   | 10 Bytes     | 5 Bytes        |  5 Bytes  | <5 Bytes, num_files Bytes , 5 Bytes>
+    uint32_t reg_buff_size = (21 + 60*file_registry.size());
+    void* reg_buff = malloc(reg_buff_size);
+    void* curr_entry = reg_buff;
+    
+    //To get the buffer to work I'm going to convert values to strings and stor the strings
+    //Set the message type in the first chunk of the buffer
+    
+    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),1);
+    curr_entry=&(((char *) curr_entry)[1]);
+
+    //This seems convoluted and there might be a more elegant way to handle this, but I'm making a padded string and inserting the characters into the buffer
+    //Set requester IP
+    std::string ip_string= std::to_string(ip);
+    ip_string = std::string(10-ip_string.size(),'0') + ip_string;
+    std::cout<<ip_string<<std::endl;
+    strncpy((char*)curr_entry,ip_string.c_str(),10);
+    curr_entry=&(((char*) curr_entry)[10]);
+
+    //Set requester port
+    std::string port_string= std::to_string(port);
+    port_string = std::string(5-port_string.size(),'0') + port_string;
+    std::cout<<port_string<<std::endl;    
+    strncpy((char*)curr_entry,port_string.c_str(),5);
+    curr_entry=&(((char*) curr_entry)[5]);
+
+    //Set number of files
+    std::string num_files_string= std::to_string(file_registry.size());
+    num_files_string = std::string(5-num_files_string.size(),'0') + num_files_string;
+    std::cout<<num_files_string<<std::endl;        
+    strncpy((char*)curr_entry,num_files_string.c_str(),5);
+    curr_entry=&(((char*) curr_entry)[5]);
+
+    //Start placing the file name/size pairs
+    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
+        std::cout<<itr->first<<": "<<itr->second<<std::endl;
+        //Enter size of string
+        uint8_t str_size = itr->first.size();
+        std::string size_string= std::to_string(str_size);
+        size_string = std::string(5-size_string.size(),'0') + size_string;
+        strncpy((char*)curr_entry,size_string.c_str(),5);        
+        curr_entry=&(((char*) curr_entry)[5]);       
+
+        //Cpy str_size chars into buffer
+        //const char* src_str =(char *)&itr->first;        
+        strncpy(((char*) curr_entry),itr->first.c_str(),str_size);
+        curr_entry=&(((char*) curr_entry)[str_size]);
+
+        std::string file_count_string= std::to_string(itr->second);
+        file_count_string = std::string(5-file_count_string.size(),'0') + file_count_string;
+        strncpy((char*)curr_entry,file_count_string.c_str(),5);  
+        curr_entry=&(((char*) curr_entry)[5]);         
+    }
+
+
+    //Set a point right after the message type marker
+/*    void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
+    ((register_request *) reg_buff_msg)[0].num_files=reg_req.num_files;
+    ((register_request *) reg_buff_msg)[0].requester_ip=reg_req.requester_ip;
+    ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
+    ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
+*/
+    send_message("Server1",8080,(char*)reg_buff, reg_buff_size);
 
 
 }

@@ -19,3 +19,5 @@ int send_message(char* target_host, uint16_t port, char* message, uint32_t messa
 int menu_prompt();
 
 void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std::string root_dir);
+
+void send_reg_req(char* files, uint16_t port);
