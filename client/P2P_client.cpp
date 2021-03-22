@@ -147,7 +147,7 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
         struct stat st;
         std::string full_path = root_dir+p_dirent->d_name;
         const char* dir = full_path.c_str();
-        printf ("[%s]\n", full_path);
+        cout<<full_path<<endl;
         if((p_subdir=opendir(dir)) != NULL){
             //Don't repeat directories, trying to exclude '.' and '..' and hidden directories like .ssh
 	    //as it seems unlikely a user would want to share out their ssh keys
@@ -160,7 +160,7 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
             //We have a file, create an entry and hash it
             stat(p_dirent->d_name,&st);
 
-            file_registry->insert(std::pair<std::string,uint32_t>((std::string)p_dirent->d_name,st.st_size));
+            file_registry->insert(std::pair<std::string,uint32_t>(p_dirent->d_name,st.st_size));
             if(DEBUG){
                 printf("%s : %d \n",p_dirent->d_name,st.st_size);
             }
