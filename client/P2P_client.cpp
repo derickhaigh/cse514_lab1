@@ -111,7 +111,7 @@ int main(int argc, char const *argv[])
     //Start placing the file name/size pairs
     for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
         std::cout<<itr->first<<": "<<itr->second<<std::endl;        
-        *((std::string*) curr_entry)=itr->first;
+        ((std::string*) curr_entry)[0]=itr->first;
         curr_entry=&(((std::string*) curr_entry)[1]);
 
         *((uint32_t*) curr_entry)=itr->second;
