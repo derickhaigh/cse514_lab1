@@ -89,6 +89,8 @@ int main(int argc, char const *argv[])
     
     void* reg_buff = malloc(sizeof(reg_req)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
 
+    send_message("Server1",8080,reg_buff);
+
     //Begin the menu loop
     int choice;
 
