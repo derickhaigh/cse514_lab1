@@ -90,22 +90,27 @@ int main(int argc, char const *argv[])
     */
     //Create a buffer to hold message
     //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
-    uint32_t reg_buff_size = (sizeof(uint64_t)*4)+(sizeof(uint64_t)+50+sizeof(uint64_t))*reg_req.files_lengths.size();
+    //      1 Byte   | 10 Bytes     | 5 Bytes        |  5 Bytes  | <5 Bytes, num_files Bytes , 5 Bytes>
+    uint32_t reg_buff_size = (21 + 60*reg_req.files_lengths.size());
     void* reg_buff = malloc(reg_buff_size);
     void* curr_entry = reg_buff;
     
     //To get the buffer to work I'm going to convert values to strings and stor the strings
     //Set the message type in the first chunk of the buffer
     
-    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),sizeof(uint64_t));
-    curr_entry=&(((uint64_t*) curr_entry)[1]);
+    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),1);
+    curr_entry=&(((char *) curr_entry)[1]);
 
+    //This seems convoluted and there might be a more elegant way to handle this, but I'm making a padded string and inserting the characters into the buffer
     //Set requester IP
-    strncpy((char*)curr_entry,std::to_string(reg_req.requester_ip).c_str(),sizeof(uint64_t));
-    curr_entry=&(((uint64_t*) curr_entry)[1]);
+    std::string ip_string= std::to_string(reg_req.requester_ip);
+    ip_string = std::string(10-ip_string.size(),'0') + ip_string;
+    std::cout<<ip_string<<std::endl;
+    strncpy((char*)curr_entry,ip_string.c_str(),10);
+    curr_entry=&(((char*) curr_entry)[10]);
 
     //Set requester port
-    strncpy((char*)curr_entry,std::to_string(reg_req.requester_port).c_str(),sizeof(uint64_t));
+    strncpy((char*)curr_entry,std::to_string(reg_req.requester_port).c_str(),5);
     curr_entry=&(((uint64_t*) curr_entry)[1]);
 
     //Set number of files
