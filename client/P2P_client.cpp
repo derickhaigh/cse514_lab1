@@ -93,7 +93,10 @@ int main(int argc, char const *argv[])
 
     //Set a point right after the message type marker
     void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
-    ((register_request *) reg_buff_msg)[0]=reg_req;
+    ((register_request *) reg_buff_msg)[0].num_files=reg_req.num_files;
+    ((register_request *) reg_buff_msg)[0].requester_ip=reg_req.requester_ip;
+    ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
+    ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
 
     send_message("Server1",8080,(char*)reg_buff);
 
