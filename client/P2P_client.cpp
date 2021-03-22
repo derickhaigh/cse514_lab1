@@ -114,7 +114,7 @@ int main(int argc, char const *argv[])
         std::cout<<itr->first<<": "<<itr->second<<std::endl;
         //Enter size of string
         uint8_t str_size = itr->first.size();
-        ((uint8_t*) curr_entry)[0]=str_size;
+        ((uint8_t*) curr_entry)[0]=htonl(str_size);
         curr_entry=&(((uint8_t*) curr_entry)[1]);       
 
         //Cpy str_size chars into buffer
@@ -122,7 +122,7 @@ int main(int argc, char const *argv[])
         strncpy(((char*) curr_entry),src_str,str_size);
         curr_entry=&(((char*) curr_entry)[str_size]);
 
-        *((uint32_t*) curr_entry)=itr->second;
+        *((uint32_t*) curr_entry)=htonl(itr->second);
         curr_entry=&(((uint32_t*) curr_entry)[1]);         
     }
 
