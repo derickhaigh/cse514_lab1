@@ -8,19 +8,65 @@
 #define SERVER_HOSTNAME "Server1"
 
 #include <stdio.h> 
+#include <stdlib.h>
 #include <sys/socket.h> 
+#include <sys/stat.h>
 #include <arpa/inet.h> 
 #include <unistd.h> 
 #include <string.h> 
 #include "../shared/P2P_shared.h"
+#include <dirent.h> // for reading direcories
 #define PORT 8080 
 #define SERVER_HOSTNAME "Server1"
    
 #define BUFF_SIZE 1024
-
+#define MAX_FILES 512
+#define DEBUG true
 
 int main(int argc, char const *argv[]) 
 { 
+    //Check if the arguements are included
+    if(argc < 4){
+        fprintf(stderr,"Usage: %s server_hostname port {data_dir | file1,file2,file3,...}\n",argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    //Get the server hostname
+    char server_host[100];
+    strcpy(server_host,argv[1]);
+
+    //Get the destination port
+    uint16_t port = atoi(argv[2]);
+
+    //Get the field of files to register
+    char* files=(char*) malloc(sizeof(char) * (strlen(argv[3])+1) );
+
+    //Construct a register message
+    //Determine if we have a directory or a list of files
+    //If we can open it as a directory it is, otherwise if is
+    //either a list of files or invalid
+    struct dirent *p_dirent;
+    DIR *p_dir;
+
+    hcreate(MAX_FILES);
+
+
+    if((p_dir=opendir(files)) != NULL){
+        //We have a directory, use a recursive function to add entries to function
+        iterate_dir(p_dir);
+    
+    }else{
+        //We might have a list of files, iterate through , seperated list and try to get file name and lengths
+    }
+
+
+    closedir(p_dir);
+
+
+    //Debug, iterate through hash table for file entries
+
+
+    //Begin the menu loop
     int choice;
 
     while(true){
@@ -84,4 +130,38 @@ int send_message(char* target_host, uint16_t port, char* message){
     valread = read( sock , buffer, 1024); 
     printf("%s\n",buffer ); 
     return 0;
+}
+
+int iterate_dir(DIR *p_dir){
+    struct dirent *p_dirent;
+    
+    //Iterate through the directory entries in the current directory
+    while ((p_dirent = readdir(p_dir)) != NULL) {
+        DIR *p_subdir;
+        struct stat st;
+        uint32_t size;
+
+        ENTRY file;
+
+        printf ("[%s]\n", p_dirent->d_name);
+        if((p_subdir=opendir(p_dirent->d_name)) != NULL){
+            //We have a directory, use a recursive function to add entries to function
+            iterate_dir(p_subdir);
+            closedir(p_subdir);
+        
+        }else{
+            //We have a file, create an entry and hash it
+            stat(p_dirent->d_name,&st);
+            size = st.st_size;
+            file.key=p_dirent->d_name;
+            file.data=&size;
+
+            hsearch(file,ENTER);
+            if(DEBUG){
+                printf("%s : %d \n",p_dirent->d_name,size);
+            }
+        }    
+    }    
+
+
 }
