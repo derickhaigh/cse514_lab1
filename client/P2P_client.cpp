@@ -167,7 +167,7 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
             }
         }else{
             //We have a file, create an entry and hash it
-            stat(p_dirent->d_name,&st);
+            stat(full_path,&st);
 
             file_registry->insert(std::pair<std::string,uint32_t>(p_dirent->d_name,st.st_size));
             if(DEBUG){
