@@ -118,8 +118,8 @@ int main(int argc, char const *argv[])
         curr_entry=&(((uint8_t*) curr_entry)[1]);       
 
         //Cpy str_size chars into buffer
-        const char* src_str =(char *)&itr->first;
-        strncpy(((char*) curr_entry),src_str,str_size);
+        //const char* src_str =(char *)&itr->first;
+        strncpy(((char*) curr_entry),itr->first.c_str(),str_size);
         curr_entry=&(((char*) curr_entry)[str_size]);
 
         *((uint32_t*) curr_entry)=htonl(itr->second);
