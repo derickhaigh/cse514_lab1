@@ -146,10 +146,12 @@ int iterate_dir(DIR *p_dir){
 
         printf ("[%s]\n", p_dirent->d_name);
         if((p_subdir=opendir(p_dirent->d_name)) != NULL){
-            //We have a directory, use a recursive function to add entries to function
-            iterate_dir(p_subdir);
-            closedir(p_subdir);
-        
+            //Don't repeat directories
+            if(p_dirent->d_name != "."){
+                //We have a directory, use a recursive function to add entries to function
+                iterate_dir(p_subdir);
+                closedir(p_subdir);
+            }
         }else{
             //We have a file, create an entry and hash it
             stat(p_dirent->d_name,&st);
