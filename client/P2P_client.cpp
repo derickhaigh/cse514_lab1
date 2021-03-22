@@ -154,6 +154,11 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
     while ((p_dirent = readdir(p_dir)) != NULL) {
         DIR *p_subdir;
         struct stat st;
+
+        //Add a / to the directory path just in case
+        if(root_dir.back() != '/'){
+            root_dir+='/';
+        }
         std::string full_path = root_dir+p_dirent->d_name;
         const char* dir = full_path.c_str();
         std::cout<<full_path<<std::endl;
@@ -167,7 +172,7 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
             }
         }else{
             //We have a file, create an entry and hash it
-            stat(full_path,&st);
+            stat(dir,&st);
 
             file_registry->insert(std::pair<std::string,uint32_t>(p_dirent->d_name,st.st_size));
             if(DEBUG){
