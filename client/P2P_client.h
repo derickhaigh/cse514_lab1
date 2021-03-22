@@ -9,7 +9,8 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 #include <pthread.h>
-
+#include <search.h>
+#include <dirent.h>
 int send_message(char* target_host, uint16_t port, char* message);
 
 int menu_prompt();

@@ -1,5 +1,5 @@
 #include <search.h>
-
+#include <stdint.h>
 int host_lookup(char* hostname, char* ip);
 
 enum MESSAGE_TYPE {
