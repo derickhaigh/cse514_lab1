@@ -84,8 +84,10 @@ int main(int argc, char const *argv[])
     std::cout<<sizeof(reg_req.num_files)<<std::endl;
     std::cout<<sizeof(reg_req.requester_ip)<<std::endl;
     std::cout<<sizeof(reg_req.requester_port)<<std::endl;
-    std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size();
-    //char* reg_buff = malloc(sizeof)
+    std::cout<<sizeof(std::pair<std::string,uint32_t>)<<endl;
+    std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size()<<endl;
+    
+    char* reg_buff = malloc(sizeof(reg_req)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
 
     //Begin the menu loop
     int choice;
