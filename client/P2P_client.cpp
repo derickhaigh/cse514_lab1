@@ -110,8 +110,11 @@ int main(int argc, char const *argv[])
     curr_entry=&(((char*) curr_entry)[10]);
 
     //Set requester port
-    strncpy((char*)curr_entry,std::to_string(reg_req.requester_port).c_str(),5);
-    curr_entry=&(((uint64_t*) curr_entry)[1]);
+    std::string port_string= std::to_string(reg_req.requester_port);
+    port_string = std::string(5-port_string.size(),'0') + port_string;
+    std::cout<<ip_string<<std::endl;    
+    strncpy((char*)curr_entry,port_string.c_str(),5);
+    curr_entry=&(((char*) curr_entry)[5]);
 
     //Set number of files
     strncpy((char*)curr_entry,std::to_string(reg_req.num_files).c_str(),sizeof(uint64_t));
