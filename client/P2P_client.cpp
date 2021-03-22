@@ -16,6 +16,7 @@
 #include <string.h> 
 #include "../shared/P2P_shared.h"
 #include <dirent.h> // for reading direcories
+#include <iostream>
 #define PORT 8080 
 #define SERVER_HOSTNAME "Server1"
    
@@ -66,7 +67,7 @@ int main(int argc, char const *argv[])
     //Debug, iterate through hash table for file entries
     std::map<std::string,uint32_t>::iterator itr;
     for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
-        printf("%s %d\n",itr->first,itr->second);        
+        std::cout<<itr->first<<": "<<itr->second<<std::endl);        
     }
 
     //Have the file registery, send the message
@@ -147,7 +148,7 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
         struct stat st;
         std::string full_path = root_dir+p_dirent->d_name;
         const char* dir = full_path.c_str();
-        cout<<full_path<<endl;
+        std::cout<<full_path<<std::endl;
         if((p_subdir=opendir(dir)) != NULL){
             //Don't repeat directories, trying to exclude '.' and '..' and hidden directories like .ssh
 	    //as it seems unlikely a user would want to share out their ssh keys
