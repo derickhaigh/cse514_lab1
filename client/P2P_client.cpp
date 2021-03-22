@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
     reg_req.requester_port=8080;
     reg_req.num_files=file_registry.size();
     reg_req.files_lengths = file_registry;
-    std::cout<<sizeof(reg_req)<<std::endl;
+    /*std::cout<<sizeof(reg_req)<<std::endl;
     std::cout<<sizeof(reg_req.files_lengths)<<std::endl;
     std::cout<<sizeof(std::string)<<std::endl;
     std::cout<<sizeof(uint32_t)<<std::endl;
@@ -86,7 +86,7 @@ int main(int argc, char const *argv[])
     std::cout<<sizeof(reg_req.requester_port)<<std::endl;
     std::cout<<sizeof(std::pair<std::string,uint32_t>)<<std::endl;
     std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size()<<std::endl;
-    
+    */
     //Create a buffer to hold message
     //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
     uint32_t reg_buff_size = sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+(sizeof(uint8_t)+50+sizeof(uint32_t))*reg_req.files_lengths.size();
@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
     void* curr_entry = reg_buff;
     
     //Set the message type in the first chunk of the buffer
-    *((uint8_t*) curr_entry)=REGISTER;
+    *((uint8_t*) curr_entry)=htonl(REGISTER);
     curr_entry=&(((uint8_t*) curr_entry)[1]);
 
     //Set requester IP
@@ -102,11 +102,11 @@ int main(int argc, char const *argv[])
     curr_entry=&(((uint32_t*) curr_entry)[1]);
 
     //Set requester port
-    *((uint16_t*) curr_entry)=reg_req.requester_port;
+    *((uint16_t*) curr_entry)=htonl(reg_req.requester_port);
     curr_entry=&(((uint16_t*) curr_entry)[1]);
 
     //Set number of files
-    *((uint16_t*) curr_entry)=reg_req.num_files;
+    *((uint16_t*) curr_entry)=htonl(reg_req.num_files);
     curr_entry=&(((uint16_t*) curr_entry)[1]);
 
     //Start placing the file name/size pairs
