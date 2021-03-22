@@ -66,9 +66,11 @@ int main(int argc, char const *argv[])
     ENTRY e;
     ENTRY *ep;
     file_descriptor* fd;
+    char key[100];
     //Debug, iterate through hash table for file entries
     for(int i = 0; i<file_count; i++){
-        sprintf(e.key, "%d", i);
+        sprintf(key, "%d", i);
+        e.key=key;
         ep = hsearch(e, FIND);
         fd=(file_descriptor*)ep->data;
         printf("%s %s",fd->filename,fd->file_len);        
