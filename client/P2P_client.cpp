@@ -101,15 +101,15 @@ int main(int argc, char const *argv[])
     curr_entry=&(((uint8_t*) curr_entry)[1]);
 
     //Set requester IP
-    *((uint32_t*) curr_entry)=reg_req.requester_ip;
+    strncpy((char*)curr_entry,std::to_string(reg_req.requester_ip).c_str(),sizeof(uint32_t));
     curr_entry=&(((uint32_t*) curr_entry)[1]);
 
     //Set requester port
-    *((uint16_t*) curr_entry)=htonl(reg_req.requester_port);
+    strncpy((char*)curr_entry,std::to_string(reg_req.requester_port).c_str(),sizeof(uint16_t));
     curr_entry=&(((uint16_t*) curr_entry)[1]);
 
     //Set number of files
-    *((uint16_t*) curr_entry)=htonl(reg_req.num_files);
+    strncpy((char*)curr_entry,std::to_string(reg_req.num_files).c_str(),sizeof(uint16_t));
     curr_entry=&(((uint16_t*) curr_entry)[1]);
 
     //Start placing the file name/size pairs
