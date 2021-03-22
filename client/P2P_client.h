@@ -12,6 +12,7 @@
 #include <search.h>
 #include <dirent.h>
 #include <map>
+#include <string>
 
 int send_message(char* target_host, uint16_t port, char* message);
 
