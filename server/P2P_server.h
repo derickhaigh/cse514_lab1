@@ -17,26 +17,9 @@
 #define MAX_THREADS 32
 
 
-enum MESSAGE_TYPE {
-    REGISTER=0,
-    FILE_LIST=1,
-    FILE_LOCATIONS=2,
-    CHUNK_REGISTER=3,
-    FILE_CHUNK=4,
-};
 
-struct register_request{
-    uint32_t requester_ip;
-    uint16_t requester_port;
 
-    uint16_t num_files;
-    std::map<std::string,uint32_t> files_lengths;
-};
 
-struct register_reply {
-    uint16_t num_files_registered;
-    std::map<std::string,bool> files_registered;
-};
 
 struct file_list_request {
 
