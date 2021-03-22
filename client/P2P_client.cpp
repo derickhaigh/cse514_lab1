@@ -141,7 +141,7 @@ int main(int argc, char const *argv[])
         std::string file_count_string= std::to_string(itr->second);
         file_count_string = std::string(5-file_count_string.size(),'0') + file_count_string;
         strncpy((char*)curr_entry,file_count_string.c_str(),5);  
-        curr_entry=&(((char*) curr_entry)[1]);         
+        curr_entry=&(((char*) curr_entry)[5]);         
     }
 
 
