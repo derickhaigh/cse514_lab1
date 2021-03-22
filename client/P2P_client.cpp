@@ -78,7 +78,11 @@ int main(int argc, char const *argv[])
     reg_req.num_files=file_registry.size();
     reg_req.files_lengths = file_registry;
     std::cout<<sizeof(reg_req)<<std::endl;
-
+    std::cout<<sizeof(reg_req.files_lengths)<<std::endl;
+    std::cout<<sizeof(reg_req.num_files)<<std::endl;
+    std::cout<<sizeof(reg_req.requester_ip)<<std::endl;
+    std::cout<<sizeof(reg_req.requester_port)<<std::endl;
+    //char* reg_buff = malloc(sizeof)
 
     //Begin the menu loop
     int choice;
