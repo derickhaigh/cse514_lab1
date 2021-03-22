@@ -88,8 +88,8 @@ int main(int argc, char const *argv[])
     std::cout<<sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size()<<std::endl;
     
     //Create a buffer to hold message
-    //  message_type | requester_ip | requester_port | num_files | array of pairs from the map
-    void* reg_buff = malloc(sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+sizeof(std::pair<std::string,uint32_t>)*reg_req.files_lengths.size());
+    //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
+    void* reg_buff = malloc(sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+(sizeof(uint8_t)+50+sizeof(uint32_t))*reg_req.files_lengths.size());
     void* curr_entry = reg_buff;
     
     //Set the message type in the first chunk of the buffer
@@ -110,9 +110,16 @@ int main(int argc, char const *argv[])
 
     //Start placing the file name/size pairs
     for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
-        std::cout<<itr->first<<": "<<itr->second<<std::endl;        
-        ((std::string*) curr_entry)[0]=itr->first;
-        curr_entry=&(((std::string*) curr_entry)[1]);
+        std::cout<<itr->first<<": "<<itr->second<<std::endl;
+        //Enter size of string
+        uint8_t str_size = itr->first.size();
+        ((uint8_t*) curr_entry)[0]=str_size;
+        curr_entry=&(((uint8_t*) curr_entry)[1]);       
+
+        //Cpy str_size chars into buffer
+        const char* src_str =(char *)&itr->first;
+        strncpy(((char*) curr_entry),src_str,str_size);
+        curr_entry=&(((char*) curr_entry)[str_size]);
 
         *((uint32_t*) curr_entry)=itr->second;
         curr_entry=&(((uint32_t*) curr_entry)[1]);         
