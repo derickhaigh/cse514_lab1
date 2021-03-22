@@ -128,16 +128,20 @@ int main(int argc, char const *argv[])
         std::cout<<itr->first<<": "<<itr->second<<std::endl;
         //Enter size of string
         uint8_t str_size = itr->first.size();
-        strncpy((char*)curr_entry,std::to_string(str_size).c_str(),sizeof(uint64_t));        
-        curr_entry=&(((uint64_t*) curr_entry)[1]);       
+        std::string size_string= std::to_string(str_size);
+        size_string = std::string(5-size_string.size(),'0') + size_string;
+        strncpy((char*)curr_entry,size_string.c_str(),5);        
+        curr_entry=&(((char*) curr_entry)[5]);       
 
         //Cpy str_size chars into buffer
-        //const char* src_str =(char *)&itr->first;
+        //const char* src_str =(char *)&itr->first;        
         strncpy(((char*) curr_entry),itr->first.c_str(),str_size);
         curr_entry=&(((char*) curr_entry)[str_size]);
 
-        strncpy((char*)curr_entry,std::to_string(itr->second).c_str(),sizeof(uint64_t));  
-        curr_entry=&(((uint64_t*) curr_entry)[1]);         
+        std::string file_count_string= std::to_string(itr->second);
+        file_count_string = std::string(5-file_count_string.size(),'0') + file_count_string;
+        strncpy((char*)curr_entry,file_count_string.c_str(),5);  
+        curr_entry=&(((char*) curr_entry)[1]);         
     }
 
 
