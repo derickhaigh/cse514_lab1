@@ -14,6 +14,7 @@
 #include <arpa/inet.h> 
 #include <unistd.h> 
 #include <string.h> 
+#include <string>
 #include "../shared/P2P_shared.h"
 #include <dirent.h> // for reading direcories
 #include <iostream>
@@ -93,8 +94,10 @@ int main(int argc, char const *argv[])
     void* reg_buff = malloc(reg_buff_size);
     void* curr_entry = reg_buff;
     
+    //To get the buffer to work I'm going to convert values to strings and stor the strings
     //Set the message type in the first chunk of the buffer
-    *((uint8_t*) curr_entry)=htonl(REGISTER);
+    
+    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),sizeof(uint8_t));
     curr_entry=&(((uint8_t*) curr_entry)[1]);
 
     //Set requester IP
