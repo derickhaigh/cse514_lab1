@@ -146,8 +146,9 @@ int iterate_dir(DIR *p_dir){
 
         printf ("[%s]\n", p_dirent->d_name);
         if((p_subdir=opendir(p_dirent->d_name)) != NULL){
-            //Don't repeat directories
-            if(p_dirent->d_name != "."){
+            //Don't repeat directories, trying to exclude '.' and '..' and hidden directories like .ssh
+	    //as it seems unlikely a user would want to share out their ssh keys
+            if(p_dirent->d_name[0] != '.'){
                 //We have a directory, use a recursive function to add entries to function
                 iterate_dir(p_subdir);
                 closedir(p_subdir);
