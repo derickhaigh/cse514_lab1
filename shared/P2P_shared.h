@@ -1,5 +1,7 @@
 #include <search.h>
 #include <stdint.h>
+#include <map>
+#include <string>
 int host_lookup(char* hostname, char* ip);
 
 enum MESSAGE_TYPE {
@@ -10,24 +12,17 @@ enum MESSAGE_TYPE {
     FILE_CHUNK=4,
 };
 
-struct file_descriptor{
+/*struct file_descriptor{
     char filename[256];
     uint32_t file_len;
-};
+};*/
 
 struct register_request{
-    char requester_hostname[100];
+    uint32_t requester_ip;
     uint16_t requester_port;
 
     uint16_t num_files;
-
-    /*
-    entry{
-        char *key;
-        void *data;
-    }
-    */
-    entry** files_lengths;
+    std::map<std::string,uint32_t> files_lengths;
 
 };
 

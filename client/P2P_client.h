@@ -15,4 +15,4 @@ int send_message(char* target_host, uint16_t port, char* message);
 
 int menu_prompt();
 
-void iterate_dir(DIR *p_dir, int* file_count);
+void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry);

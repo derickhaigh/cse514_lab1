@@ -48,12 +48,11 @@ int main(int argc, char const *argv[])
     struct dirent *p_dirent;
     DIR *p_dir;
 
-    hcreate(MAX_FILES);
-    int file_count=0;
+    std::map<std::string,uint32_t> file_registry;
 
     if((p_dir=opendir(files)) != NULL){
         //We have a directory, use a recursive function to add entries to function
-        iterate_dir(p_dir,&file_count);
+        iterate_dir(p_dir,&file_registry);
     
     }else{
         //We might have a list of files, iterate through , seperated list and try to get file name and lengths
@@ -63,18 +62,14 @@ int main(int argc, char const *argv[])
     closedir(p_dir);
     free(files);
 
-    ENTRY e;
-    ENTRY *ep;
-    file_descriptor* fd;
-    char key[100];
+
     //Debug, iterate through hash table for file entries
-    for(int i = 0; i<file_count; i++){
-        sprintf(key, "%d", i);
-        e.key=key;
-        ep = hsearch(e, FIND);
-        fd=(file_descriptor*)ep->data;
-        printf("%s %s",fd->filename,fd->file_len);        
+    std::map<std::string,uint32_t>::iterator itr;
+    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
+        printf("%s %d\n",itr->first,itr->second);        
     }
+
+    //Have the file registery, send the message
 
     //Begin the menu loop
     int choice;
@@ -143,17 +138,13 @@ int send_message(char* target_host, uint16_t port, char* message){
     return 0;
 }
 
-void iterate_dir(DIR *p_dir, int *file_count){
+void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry){
     struct dirent *p_dirent;
     
     //Iterate through the directory entries in the current directory
     while ((p_dirent = readdir(p_dir)) != NULL) {
         DIR *p_subdir;
         struct stat st;
-        file_descriptor fd;
-
-
-        ENTRY file;
 
         printf ("[%s]\n", p_dirent->d_name);
         if((p_subdir=opendir(p_dirent->d_name)) != NULL){
@@ -161,21 +152,16 @@ void iterate_dir(DIR *p_dir, int *file_count){
 	    //as it seems unlikely a user would want to share out their ssh keys
             if(p_dirent->d_name[0] != '.'){
                 //We have a directory, use a recursive function to add entries to function
-                iterate_dir(p_subdir, file_count);
+                iterate_dir(p_subdir, file_registry);
                 closedir(p_subdir);
             }
         }else{
             //We have a file, create an entry and hash it
             stat(p_dirent->d_name,&st);
-            fd.file_len = st.st_size;
-            strcpy(fd.filename,p_dirent->d_name);
-            sprintf(file.key, "%d", *file_count);
-            *file_count+=1;
-            file.data=&fd;
 
-            hsearch(file,ENTER);
+            file_registry->insert(std::pair<std::string,uint32_t>(p_dirent->d_name,st.st_size));
             if(DEBUG){
-                printf("%s : %d \n",p_dirent->d_name,fd.file_len);
+                printf("%s : %d \n",p_dirent->d_name,st.st_size);
             }
         }    
     }    
