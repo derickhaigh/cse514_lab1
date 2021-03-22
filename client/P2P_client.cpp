@@ -73,7 +73,7 @@ int main(int argc, char const *argv[])
     //Have the file registery, send the message
     std::cout<<sizeof(file_registry)<<std::endl;
     register_request reg_req;
-    reg_req.requester_ip= inet_pton("127.0.0.1"); //need to get actual IP
+    inet_pton(AF_INET,"127.0.0.1",&reg_req.requester_ip); //need to get actual IP
     reg_req.requester_port=8080;
     reg_req.num_files=file_registry.size();
     reg_req.files_lengths = file_registry;
