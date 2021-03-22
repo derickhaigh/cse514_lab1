@@ -52,7 +52,7 @@ int main(int argc, char const *argv[])
 
     if((p_dir=opendir(files)) != NULL){
         //We have a directory, use a recursive function to add entries to function
-        iterate_dir(p_dir,&file_registry);
+        iterate_dir(p_dir,&file_registry,files);
     
     }else{
         //We might have a list of files, iterate through , seperated list and try to get file name and lengths
@@ -138,21 +138,22 @@ int send_message(char* target_host, uint16_t port, char* message){
     return 0;
 }
 
-void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry){
+void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std::string root_dir){
     struct dirent *p_dirent;
-    
+
     //Iterate through the directory entries in the current directory
     while ((p_dirent = readdir(p_dir)) != NULL) {
         DIR *p_subdir;
         struct stat st;
-
-        printf ("[%s]\n", p_dirent->d_name);
-        if((p_subdir=opendir(p_dirent->d_name)) != NULL){
+        std::string full_path = root_dir+p_dirent->d_name;
+        const char* dir = full_path.c_str();
+        printf ("[%s]\n", full_path);
+        if((p_subdir=opendir(dir)) != NULL){
             //Don't repeat directories, trying to exclude '.' and '..' and hidden directories like .ssh
 	    //as it seems unlikely a user would want to share out their ssh keys
             if(p_dirent->d_name[0] != '.'){
                 //We have a directory, use a recursive function to add entries to function
-                iterate_dir(p_subdir, file_registry);
+                iterate_dir(p_subdir, file_registry, root_dir+p_dirent->d_name);
                 closedir(p_subdir);
             }
         }else{
