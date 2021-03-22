@@ -11,6 +11,8 @@
 #include <pthread.h>
 #include <search.h>
 #include <dirent.h>
+#include <map>
+
 int send_message(char* target_host, uint16_t port, char* message);
 
 int menu_prompt();
