@@ -79,6 +79,8 @@ int main(int argc, char const *argv[])
     reg_req.files_lengths = file_registry;
     std::cout<<sizeof(reg_req)<<std::endl;
     std::cout<<sizeof(reg_req.files_lengths)<<std::endl;
+    std::cout<<sizeof(std::string)<<std::endl;
+    std::cout<<sizeof(uint32_t)<<std::endl;
     std::cout<<sizeof(reg_req.num_files)<<std::endl;
     std::cout<<sizeof(reg_req.requester_ip)<<std::endl;
     std::cout<<sizeof(reg_req.requester_port)<<std::endl;
