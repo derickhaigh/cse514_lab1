@@ -90,43 +90,43 @@ int main(int argc, char const *argv[])
     */
     //Create a buffer to hold message
     //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
-    uint32_t reg_buff_size = sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+(sizeof(uint8_t)+50+sizeof(uint32_t))*reg_req.files_lengths.size();
+    uint32_t reg_buff_size = (sizeof(uint64_t)*4)+(sizeof(uint64_t)+50+sizeof(uint64_t))*reg_req.files_lengths.size();
     void* reg_buff = malloc(reg_buff_size);
     void* curr_entry = reg_buff;
     
     //To get the buffer to work I'm going to convert values to strings and stor the strings
     //Set the message type in the first chunk of the buffer
     
-    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),sizeof(uint8_t));
-    curr_entry=&(((uint8_t*) curr_entry)[1]);
+    strncpy((char*)curr_entry,std::to_string(REGISTER).c_str(),sizeof(uint64_t));
+    curr_entry=&(((uint64_t*) curr_entry)[1]);
 
     //Set requester IP
-    strncpy((char*)curr_entry,std::to_string(reg_req.requester_ip).c_str(),sizeof(uint32_t));
-    curr_entry=&(((uint32_t*) curr_entry)[1]);
+    strncpy((char*)curr_entry,std::to_string(reg_req.requester_ip).c_str(),sizeof(uint64_t));
+    curr_entry=&(((uint64_t*) curr_entry)[1]);
 
     //Set requester port
-    strncpy((char*)curr_entry,std::to_string(reg_req.requester_port).c_str(),sizeof(uint16_t));
-    curr_entry=&(((uint16_t*) curr_entry)[1]);
+    strncpy((char*)curr_entry,std::to_string(reg_req.requester_port).c_str(),sizeof(uint64_t));
+    curr_entry=&(((uint64_t*) curr_entry)[1]);
 
     //Set number of files
-    strncpy((char*)curr_entry,std::to_string(reg_req.num_files).c_str(),sizeof(uint16_t));
-    curr_entry=&(((uint16_t*) curr_entry)[1]);
+    strncpy((char*)curr_entry,std::to_string(reg_req.num_files).c_str(),sizeof(uint64_t));
+    curr_entry=&(((uint64_t*) curr_entry)[1]);
 
     //Start placing the file name/size pairs
     for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
         std::cout<<itr->first<<": "<<itr->second<<std::endl;
         //Enter size of string
         uint8_t str_size = itr->first.size();
-        ((uint8_t*) curr_entry)[0]=htonl(str_size);
-        curr_entry=&(((uint8_t*) curr_entry)[1]);       
+        strncpy((char*)curr_entry,std::to_string(str_size).c_str(),sizeof(uint64_t));        
+        curr_entry=&(((uint64_t*) curr_entry)[1]);       
 
         //Cpy str_size chars into buffer
         //const char* src_str =(char *)&itr->first;
         strncpy(((char*) curr_entry),itr->first.c_str(),str_size);
         curr_entry=&(((char*) curr_entry)[str_size]);
 
-        *((uint32_t*) curr_entry)=htonl(itr->second);
-        curr_entry=&(((uint32_t*) curr_entry)[1]);         
+        strncpy((char*)curr_entry,std::to_string(itr->second).c_str(),sizeof(uint64_t));  
+        curr_entry=&(((uint64_t*) curr_entry)[1]);         
     }
 
 
