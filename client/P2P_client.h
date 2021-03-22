@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 
-int send_message(char* target_host, uint16_t port, char* message);
+int send_message(char* target_host, uint16_t port, char* message, uint32_t message_len);
 
 int menu_prompt();
 

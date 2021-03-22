@@ -89,7 +89,8 @@ int main(int argc, char const *argv[])
     
     //Create a buffer to hold message
     //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
-    void* reg_buff = malloc(sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+(sizeof(uint8_t)+50+sizeof(uint32_t))*reg_req.files_lengths.size());
+    uint32_t reg_buff_size = sizeof(uint8_t)+sizeof(uint32_t)+sizeof(uint16_t)+sizeof(uint16_t)+(sizeof(uint8_t)+50+sizeof(uint32_t))*reg_req.files_lengths.size();
+    void* reg_buff = malloc(reg_buff_size);
     void* curr_entry = reg_buff;
     
     //Set the message type in the first chunk of the buffer
@@ -133,14 +134,14 @@ int main(int argc, char const *argv[])
     ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
     ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
 */
-    send_message("Server1",8080,(char*)reg_buff);
+    send_message("Server1",8080,(char*)reg_buff, reg_buff_size);
 
     //Begin the menu loop
     int choice;
 
     while(true){
         choice=menu_prompt();
-        send_message(SERVER_HOSTNAME,PORT,"Test message");
+        send_message(SERVER_HOSTNAME,PORT,"Test message", strlen("Test message"));
     }
     return 0; 
 
@@ -156,7 +157,7 @@ int menu_prompt(){
     return choice;
 }
 
-int send_message(char* target_host, uint16_t port, char* message){
+int send_message(char* target_host, uint16_t port, char* message, uint32_t message_len){
     int sock = 0, valread; 
     struct sockaddr_in serv_addr;     
     char *hello = "Hello from client"; 
@@ -195,7 +196,7 @@ int send_message(char* target_host, uint16_t port, char* message){
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
-    send(sock , local_hostname, strlen(local_hostname) , 0 ); 
+    send(sock , message, message_len , 0 ); 
     printf("Hello message sent\n"); 
     valread = read( sock , buffer, 1024); 
     printf("%s\n",buffer ); 
