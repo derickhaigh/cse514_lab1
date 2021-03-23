@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
                 //If something needed to be done here do it
             }else if(events[n].events & EPOLLIN){
                 if(events[n].data.fd == server_fd) {
-                    printf("Connection accept");
+                    printf("Connection accept\n");
                     
                     //Accept connection
                     if ((new_socket = accept(server_fd, (struct sockaddr *)&address,(socklen_t*)&addrlen))<0){
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]){
 
                 }else{
                     char* read_buff = (char*)malloc(BUFF_SIZE);
-                    printf("Get Data");
+                    printf("Get Data\n");
                     valread=read(events[n].data.fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
                     
@@ -136,7 +136,7 @@ int requestHandler(int client_fd){
     int num_bytes;
     printf("Request Handler called for fd %i\n",client_fd);
     if(num_bytes=recv(client_fd,buffer,2000,0)<0){
-        perror("Failure to read socket message");
+        perror("Failure to read socket message\n");
         return -1;
     }else{
         printf("Message received from client_fd %i: %s\n",client_fd,buffer);
@@ -151,7 +151,11 @@ int requestHandler(int client_fd){
 int parse_request(int fd,char* req_buff){
 
     //First byte holds a request type
-    uint8_t request_type = req_buff[0];
+    char req_str[1];
+    strncpy(req_str,req_buff,1);
+    uint8_t request_type;
+    sscanf(req_str, "%d", &request_type);
+
 
     switch(request_type){
         case REGISTER:
