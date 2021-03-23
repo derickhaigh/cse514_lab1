@@ -48,6 +48,8 @@ int main(int argc, char const *argv[])
     //Register available files
     send_reg_req(files, port);
 
+    free(files);
+
     //Begin the menu loop
     int choice;
 
@@ -173,8 +175,6 @@ void send_reg_req(char* files, uint16_t port){
 
 
     closedir(p_dir);
-    free(files);
-
 
     //Debug, iterate through hash table for file entries
     std::map<std::string,uint32_t>::iterator itr;/*
@@ -190,7 +190,7 @@ void send_reg_req(char* files, uint16_t port){
 
     //Create a buffer to hold message
     //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
-    //      1 Byte   | 10 Bytes     | 5 Bytes        |  5 Bytes  | <5 Bytes, num_files Bytes , 5 Bytes>
+    //      1 Byte   | 10 Bytes     | 5 Bytes        |  5 Bytes  | <5 Bytes, num_files Bytes , 10 Bytes>
     uint32_t reg_buff_size = (21 + 60*file_registry.size());
     void* reg_buff = malloc(reg_buff_size);
     void* curr_entry = reg_buff;
@@ -239,8 +239,8 @@ void send_reg_req(char* files, uint16_t port){
         curr_entry=&(((char*) curr_entry)[str_size]);
 
         std::string file_count_string= std::to_string(itr->second);
-        file_count_string = std::string(5-file_count_string.size(),'0') + file_count_string;
-        strncpy((char*)curr_entry,file_count_string.c_str(),5);  
+        file_count_string = std::string(10-file_count_string.size(),'0') + file_count_string;
+        strncpy((char*)curr_entry,file_count_string.c_str(),10);  
         curr_entry=&(((char*) curr_entry)[5]);         
     }
 
