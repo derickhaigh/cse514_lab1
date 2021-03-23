@@ -75,7 +75,7 @@ int main(int argc, char* argv[]){
         int n = epoll_wait(epfd,events,EPOLL_QUEUE_LEN,TIMEOUT);
 
         //Go through all events
-        for(n;n>0;--n){
+        while(n-- > 0){
             if(events[n].events & EPOLLRDHUP){
                 printf("Client socket closed\n");
                 //If something needed to be done here do it
