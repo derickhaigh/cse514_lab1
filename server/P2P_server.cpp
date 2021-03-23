@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
     //Set some flags on events to detect, read avail, connection close, and edge-trigger notification  
     event.events = EPOLLIN|EPOLLRDHUP|EPOLLET;
     event.data.fd = server_fd;
-    if((epoll_ctl, epfd, EPOLL_CTL_ADD, server_fd, &event) == -1){
+    if(epoll_ctl(epfd, EPOLL_CTL_ADD, server_fd, &event) == -1){
         perror("Error in epoll_ctl");
         exit(EXIT_FAILURE);
     }
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]){
                     struct epoll_event new_ev;
                     new_ev.events = EPOLLIN|EPOLLRDHUP|EPOLLET;
                     new_ev.data.fd=new_socket;
-                    if((epoll_ctl, epfd, EPOLL_CTL_ADD, new_socket, &new_ev) == -1){
+                    if(epoll_ctl(epfd, EPOLL_CTL_ADD, new_socket, &new_ev) == -1){
                         perror("Error in epoll_ctl");
                         exit(EXIT_FAILURE);
                     }                    
