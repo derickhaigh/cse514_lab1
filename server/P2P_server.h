@@ -69,9 +69,7 @@ int parse_request(int fd,char* req_buff);
 
 int register_files();
 
-int file_list(){
-    return 0;
-}
+int file_list();
 
 int file_locations();
 
