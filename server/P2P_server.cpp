@@ -101,13 +101,38 @@ int main(int argc, char* argv[]){
                 }else{
                     char* read_buff = (char*)malloc(BUFF_SIZE);
                     printf("Get Data\n");
-                    int fd = events[n].data.fd;
-                    valread=read(fd,read_buff,BUFF_SIZE);
+                    valread=read(events[n].data.fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
                     
-                    parse_request(fd,&read_buff);
+                    //Seems like the stack is being stomped when calling?
+                    //parse_request(events[n].data.fd,&read_buff);
+
+                    //First byte holds a request type
+                    char req_str[1];
+                    strncpy(req_str,*req_buff,1);
+                    uint8_t request_type;
+                    sscanf(req_str, "%d", &request_type);
+
+
+                    switch(request_type){
+                        case REGISTER:
+                            register_files();
+                            break;
+                        case FILE_LIST:
+                            file_list();
+                            break;
+                        case FILE_LOCATIONS:
+                            file_locations();
+                            break;
+                        case CHUNK_REGISTER:
+                            chunk_register();
+                            break;
+                        case FILE_CHUNK:
+                            file_chunk();
+                            break;
+                    }                    
                     
-                    send(fd,hello,strlen(hello),0);
+                    send(events[n].data.fd,hello,strlen(hello),0);
                     printf("Hello Message Sent\n");     
 
 
