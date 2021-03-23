@@ -1,6 +1,7 @@
 #include <search.h>
 #include <stdint.h>
 #include <map>
+#include <vector>
 #include <string>
 int host_lookup(char* hostname, char* ip);
 
@@ -29,4 +30,12 @@ struct register_request{
 struct register_reply {
     uint16_t num_files_registered;
     entry** files_registerd;    
+};
+
+struct file_entry {
+    uint16_t file_size;
+    uint16_t num_chunks;
+
+    //Probably want to change to use IPs
+    std::map<std::string,std::vector<uint16_t>> host_chunks;
 };

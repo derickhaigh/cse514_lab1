@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
+#include "../shared/P2P_shared.h"
 
 #define CHUNK_SIZE = 1048576  //1MB in bytes
 #define PORT 8080
@@ -65,9 +66,9 @@ struct file_chunk_reply{
 
 int requestHandler(int client_fd);
 
-int parse_request(int fd,char** req_buff);
+int parse_request(int fd,char** req_buff, std::map<std::string,file_entry>& file_entries);
 
-int register_files();
+int register_files(int fd,char** req_buff, std::map<std::string,file_entry>& file_entries);
 
 int file_list();
 

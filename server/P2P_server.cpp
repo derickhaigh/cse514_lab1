@@ -4,8 +4,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include "../shared/P2P_shared.h"
 #include <sys/epoll.h>
+#include <map>
+#include <vector>
 
 
 #define PORT 8080
@@ -20,6 +21,13 @@ int main(int argc, char* argv[]){
     int addrlen = sizeof(address);
     char buffer[BUFF_SIZE] = {0};
     char *hello = "Hello from server at ";
+
+    //Create a data structure for holding a map of file and hosts
+    //Key of file name, value will be struct for a file that itself
+    //holds the file size, how many chunks it has, and a map of <hostname,vector of chunks>
+    //I'll assume any files initially registerd by a client would have every chunk
+    
+    std::map<std::string,file_entry> file_entries;
 
 
     //Create epoll call FD
@@ -104,34 +112,7 @@ int main(int argc, char* argv[]){
                     valread=read(events[n].data.fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
                     
-                    //Seems like the stack is being stomped when calling?
-                    parse_request(events[n].data.fd,&read_buff);  
-
-                    /*//First byte holds a request type
-                    char req_str[1];
-                    strncpy(req_str,read_buff,1);
-                    uint8_t request_type;
-                    sscanf(req_str, "%d", &request_type);
-
-
-                    switch(request_type){
-                        case REGISTER:
-                            register_files();
-                            break;
-                        case FILE_LIST:
-                            file_list();
-                            break;
-                        case FILE_LOCATIONS:
-                            file_locations();
-                            break;
-                        case CHUNK_REGISTER:
-                            chunk_register();
-                            break;
-                        case FILE_CHUNK:
-                            file_chunk();
-                            break;
-                    }*/
-
+                    parse_request(events[n].data.fd,&read_buff, file_entries);  
 
                     
                     send(events[n].data.fd,hello,strlen(hello),0);
@@ -176,7 +157,7 @@ int requestHandler(int client_fd){
 
 }
 
-int parse_request(int fd,char** req_buff){
+int parse_request(int fd,char** req_buff, std::map<std::string,file_entry>& file_entries){
 
     //First byte holds a request type
     char req_str[1];
@@ -188,7 +169,7 @@ int parse_request(int fd,char** req_buff){
 
     switch(request_type){
         case REGISTER:
-            register_files();
+            register_files(fd, req_buff, file_entries);
             break;
         case FILE_LIST:
             file_list();
@@ -208,7 +189,45 @@ int parse_request(int fd,char** req_buff){
     return 0;
 }
 
-int register_files(){
+int register_files(int fd,char** req_buff, std::map<std::string,file_entry>& file_entries){
+
+    //Parse this message to get enter new files
+    //  message_type | requester_ip | requester_port | num_files | bitstream of <name length | filename(going to assume no filesnames larger than 50 bytes for now) | file size>
+    //      1 Byte   | 10 Bytes     | 5 Bytes        |  5 Bytes  | <5 Bytes, num_files Bytes , 10 Bytes>
+    //get number of files
+    char num_files_str[5];
+    strncpy(num_files_str,(*req_buff)+16,5);
+    uint8_t num_files=atoi(num_files_str);    
+    
+    //Begin iterating through files
+    char* filenames = (*req_buff + 21);
+    for(int n = 0; n<num_files;n++){
+
+        char* curr_file = filenames;
+
+        //Extract number of characters in filename
+        char curr_filename_size[5];
+        strncpy(curr_filename_size,curr_file,5);
+        uint16_t filename_size=atoi(curr_filename_size);      
+        curr_file+=5;
+
+        //Extract filename
+        char curr_filename[filename_size];
+        strncpy(curr_filename,curr_file,filename_size);
+        curr_file+=filename_size;
+
+        //Extract file size in bytes          
+        char curr_file_size[10];
+        strncpy(curr_file_size,curr_file,10);
+        uint32_t file_size=atoi(curr_file_size);      
+        curr_file+=10;
+
+        //Enter value into file_entries map
+
+
+    }
+
+
     printf("register files\n");
     return 0;
 }
