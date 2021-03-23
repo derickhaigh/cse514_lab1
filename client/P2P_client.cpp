@@ -44,47 +44,15 @@ int main(int argc, char const *argv[])
     char* files=(char*) malloc(sizeof(char) * (strlen(argv[3])+1) );
     strcpy(files,argv[3]);
 
-
-    //Register available files
-    send_reg_req(files, port);
-
-    free(files);
-
-    //Begin the menu loop
-    int choice;
-
-    while(true){
-        choice=menu_prompt();
-        send_message(SERVER_HOSTNAME,PORT,"Test message", strlen("Test message"));
-    }
-    return 0; 
-
-} 
-
-int menu_prompt(){
-    int choice = 0;
-    while(choice < 1 || choice > 3){
-        printf("1) List Available Files\n2) Download File\n3) View Active Downloads\n");
-        scanf("%d",&choice);
-        printf("\n\n");
-    }
-    return choice;
-}
-
-int send_message(char* target_host, uint16_t port, char* message, uint32_t message_len){
-    int sock = 0, valread; 
-    struct sockaddr_in serv_addr;     
-    char *hello = "Hello from client"; 
-    char buffer[BUFF_SIZE] = {0}; 
-    
-    //Get host IP from the hostname
+//Get host IP from the hostname
     char* hostname = SERVER_HOSTNAME;
     char ip[100];
     if(host_lookup(hostname,ip) < 0){
         perror("Error in host lookup");
         exit(EXIT_FAILURE);
     }
-
+    int sock=0;
+    struct sockaddr_in serv_addr; 
     char local_hostname[BUFF_SIZE];
     gethostname(local_hostname,BUFF_SIZE-1);
 
@@ -110,6 +78,38 @@ int send_message(char* target_host, uint16_t port, char* message, uint32_t messa
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
+
+    //Register available files
+    send_reg_req(files, port, sock);
+
+    free(files);
+
+    //Begin the menu loop
+    int choice;
+
+    while(true){
+        choice=menu_prompt();
+        send_message(SERVER_HOSTNAME,PORT,"Test message", strlen("Test message"),sock);
+    }
+    return 0; 
+
+} 
+
+int menu_prompt(){
+    int choice = 0;
+    while(choice < 1 || choice > 3){
+        printf("1) List Available Files\n2) Download File\n3) View Active Downloads\n");
+        scanf("%d",&choice);
+        printf("\n\n");
+    }
+    return choice;
+}
+
+int send_message(char* target_host, uint16_t port, char* message, uint32_t message_len, int sock){
+    int  valread;     
+    char *hello = "Hello from client"; 
+    char buffer[BUFF_SIZE] = {0}; 
+    
     send(sock , message, message_len , 0 ); 
     printf("Hello message sent\n"); 
     valread = read( sock , buffer, 1024); 
@@ -154,7 +154,7 @@ void iterate_dir(DIR *p_dir, std::map<std::string,uint32_t> *file_registry, std:
 
 }
 
-void send_reg_req(char* files, uint16_t port){
+void send_reg_req(char* files, uint16_t port, int sock){
 
     //Construct a register message
     //Determine if we have a directory or a list of files
@@ -252,7 +252,7 @@ void send_reg_req(char* files, uint16_t port){
     ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
     ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
 */
-    send_message("Server1",8080,(char*)reg_buff, reg_buff_size);
+    send_message("Server1",8080,(char*)reg_buff, reg_buff_size, sock);
 
 
 }
