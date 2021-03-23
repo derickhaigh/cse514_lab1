@@ -101,12 +101,13 @@ int main(int argc, char* argv[]){
                 }else{
                     char* read_buff = (char*)malloc(BUFF_SIZE);
                     printf("Get Data\n");
-                    valread=read(events[n].data.fd,read_buff,BUFF_SIZE);
+                    int fd = events[n].data.fd;
+                    valread=read(fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
                     
-                    parse_request(events[n].data.fd,read_buff);
+                    parse_request(fd,read_buff);
                     
-                    send(events[n].data.fd,hello,strlen(hello),0);
+                    send(fd,hello,strlen(hello),0);
                     printf("Hello Message Sent\n");     
 
 
