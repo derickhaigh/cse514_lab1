@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
                     valread=read(fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
                     
-                    parse_request(fd,read_buff);
+                    parse_request(fd,&read_buff);
                     
                     send(fd,hello,strlen(hello),0);
                     printf("Hello Message Sent\n");     
@@ -149,11 +149,11 @@ int requestHandler(int client_fd){
 
 }
 
-int parse_request(int fd,char* req_buff){
+int parse_request(int fd,char** req_buff){
 
     //First byte holds a request type
     char req_str[1];
-    strncpy(req_str,req_buff,1);
+    strncpy(req_str,*req_buff,1);
     uint8_t request_type;
     sscanf(req_str, "%d", &request_type);
 

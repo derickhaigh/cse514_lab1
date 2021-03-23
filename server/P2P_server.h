@@ -65,7 +65,7 @@ struct file_chunk_reply{
 
 int requestHandler(int client_fd);
 
-int parse_request(int fd,char* req_buff);
+int parse_request(int fd,char** req_buff);
 
 int register_files();
 
