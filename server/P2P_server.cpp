@@ -105,7 +105,34 @@ int main(int argc, char* argv[]){
                     printf("%s\n",read_buff);
                     
                     //Seems like the stack is being stomped when calling?
-                    parse_request(events[n].data.fd,&read_buff);               
+                    //parse_request(events[n].data.fd,&read_buff);  
+
+                    //First byte holds a request type
+                    char req_str[1];
+                    strncpy(req_str,read_buff,1);
+                    uint8_t request_type;
+                    sscanf(req_str, "%d", &request_type);
+
+
+                    switch(request_type){
+                        case REGISTER:
+                            register_files();
+                            break;
+                        case FILE_LIST:
+                            file_list();
+                            break;
+                        case FILE_LOCATIONS:
+                            file_locations();
+                            break;
+                        case CHUNK_REGISTER:
+                            chunk_register();
+                            break;
+                        case FILE_CHUNK:
+                            file_chunk();
+                            break;
+                    }
+
+
                     
                     send(events[n].data.fd,hello,strlen(hello),0);
                     printf("Hello Message Sent\n");     
