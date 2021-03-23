@@ -185,7 +185,7 @@ int parse_request(int fd,char** req_buff){
     sscanf(req_str, "%d", &request_type);
 */
 
-    switch(request_type){
+    switch(0){
         case REGISTER:
             register_files();
             break;
