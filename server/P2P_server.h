@@ -64,3 +64,17 @@ struct file_chunk_reply{
 };
 
 int requestHandler(int client_fd);
+
+int parse_request(int fd,char* req_buff);
+
+int register_files();
+
+int file_list(){
+    return 0;
+}
+
+int file_locations();
+
+int chunk_register();
+
+int file_chunk();

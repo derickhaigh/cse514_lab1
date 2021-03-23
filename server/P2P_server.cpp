@@ -7,6 +7,7 @@
 #include "../shared/P2P_shared.h"
 #include <sys/epoll.h>
 
+
 #define PORT 8080
 #define BUFF_SIZE 4024
 #define EPOLL_QUEUE_LEN 32
@@ -98,12 +99,17 @@ int main(int argc, char* argv[]){
                     }                    
 
                 }else{
-                    char* read_buff[BUFF_SIZE];
+                    char* read_buff = (char*)malloc(BUFF_SIZE);
                     printf("Get Data");
                     valread=read(events[n].data.fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
+                    
+                    parse_request(events[n].data.fd,read_buff);
+                    
                     send(events[n].data.fd,hello,strlen(hello),0);
-                    printf("Hello Message Sent\n");                    
+                    printf("Hello Message Sent\n");     
+
+
 
                 }
             }
@@ -140,4 +146,54 @@ int requestHandler(int client_fd){
 
     
 
+}
+
+int parse_request(int fd,char* req_buff){
+
+    //First byte holds a request type
+    uint8_t request_type = req_buff[0];
+
+    switch(request_type){
+        case REGISTER:
+            register_files();
+            break;
+        case FILE_LIST:
+            file_list();
+            break;
+        case FILE_LOCATIONS:
+            file_locations();
+            break;
+        case CHUNK_REGISTER:
+            chunk_register();
+            break;
+        case FILE_CHUNK:
+            file_chunk();
+            break;
+    }
+
+}
+
+int register_files(){
+    printf("register files\n");
+    return 0;
+}
+
+int file_list(){
+    printf("file_list\n");
+    return 0;
+}
+
+int file_locations(){
+    printf("file_locations\n");
+    return 0;
+}
+
+int chunk_register(){
+    printf("chunk_register\n");    
+    return 0;
+}
+
+int file_chunk(){
+    printf("file_chunk\n");    
+    return 0;
 }
