@@ -105,9 +105,9 @@ int main(int argc, char* argv[]){
                     printf("%s\n",read_buff);
                     
                     //Seems like the stack is being stomped when calling?
-                    //parse_request(events[n].data.fd,&read_buff);  
+                    parse_request(events[n].data.fd,&read_buff);  
 
-                    //First byte holds a request type
+                    /*//First byte holds a request type
                     char req_str[1];
                     strncpy(req_str,read_buff,1);
                     uint8_t request_type;
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]){
                         case FILE_CHUNK:
                             file_chunk();
                             break;
-                    }
+                    }*/
 
 
                     
@@ -179,11 +179,11 @@ int requestHandler(int client_fd){
 int parse_request(int fd,char** req_buff){
 
     //First byte holds a request type
-    char req_str[1];
+    /*char req_str[1];
     strncpy(req_str,*req_buff,1);
     uint8_t request_type;
     sscanf(req_str, "%d", &request_type);
-
+*/
 
     switch(request_type){
         case REGISTER:
