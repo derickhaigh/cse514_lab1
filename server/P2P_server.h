@@ -76,4 +76,4 @@ int file_locations();
 
 int chunk_register();
 
-int file_chunk();
+int leave();

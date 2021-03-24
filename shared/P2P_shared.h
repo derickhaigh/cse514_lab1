@@ -10,7 +10,7 @@ enum MESSAGE_TYPE {
     FILE_LIST=1,
     FILE_LOCATIONS=2,
     CHUNK_REGISTER=3,
-    FILE_CHUNK=4,
+    LEAVE=4,
 };
 
 /*struct file_descriptor{

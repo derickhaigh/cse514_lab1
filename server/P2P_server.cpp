@@ -26,7 +26,6 @@ int main(int argc, char* argv[]){
     //Key of file name, value will be struct for a file that itself
     //holds the file size, how many chunks it has, and a map of <hostname,vector of chunks>
     //I'll assume any files initially registerd by a client would have every chunk
-    
     std::map<std::string,file_entry> file_entries;
 
 
@@ -107,14 +106,17 @@ int main(int argc, char* argv[]){
                     }                    
 
                 }else{
+                    //Read the socket message into a buffer.
                     char* read_buff = (char*)malloc(BUFF_SIZE);
                     printf("Get Data\n");
                     valread=read(events[n].data.fd,read_buff,BUFF_SIZE);
                     printf("%s\n",read_buff);
                     
+                    //Parse the buffer to find out the request type and pass on the relevent data to the relevent funtion
+                    //Eventually this function or a sub function should send the request response using the appropriate FD
                     parse_request(events[n].data.fd,&read_buff, file_entries);  
 
-                    
+                    free(read_buff);
                     send(events[n].data.fd,hello,strlen(hello),0);
                     printf("Hello Message Sent\n");     
 
@@ -152,9 +154,7 @@ int requestHandler(int client_fd){
         send(client_fd,buffer,num_bytes,0);
         return 0;
     }
-
-    
-
+    return 0;
 }
 
 int parse_request(int fd,char** req_buff, std::map<std::string,file_entry>& file_entries){
@@ -163,10 +163,7 @@ int parse_request(int fd,char** req_buff, std::map<std::string,file_entry>& file
     char req_str[1];
     strncpy(req_str,*req_buff,1);
     uint8_t request_type=atoi(req_str);
-    //sscanf(req_str, "%d", &request_type);
     
-
-
     switch(request_type){
         case REGISTER:
             register_files(fd, req_buff, file_entries);
@@ -180,8 +177,8 @@ int parse_request(int fd,char** req_buff, std::map<std::string,file_entry>& file
         case CHUNK_REGISTER:
             chunk_register();
             break;
-        case FILE_CHUNK:
-            file_chunk();
+        case LEAVE:
+            leave();
             break;
     }
 
@@ -223,7 +220,7 @@ int register_files(int fd,char** req_buff, std::map<std::string,file_entry>& fil
         curr_file+=10;
 
         //Enter value into file_entries map
-
+        //Also need to track which files are successfully registered for the message
 
     }
 
@@ -233,21 +230,28 @@ int register_files(int fd,char** req_buff, std::map<std::string,file_entry>& fil
 }
 
 int file_list(){
+    //This function would basically send a buffer containing every file in the file_entries map
+    //This would probably introduce some scaling issues with my code as the buffer might need to dynamically sized 
     printf("file_list\n");
     return 0;
 }
 
 int file_locations(){
+    //Go through file entries and send back whatever hosts are listed for the file entry
     printf("file_locations\n");
     return 0;
 }
 
 int chunk_register(){
+    //Register the chunk as available on the host in the file_entries
+    //If the host doesn't have any chunks registered it would create a new entry for that host
     printf("chunk_register\n");    
     return 0;
 }
 
-int file_chunk(){
-    printf("file_chunk\n");    
+int leave(){
+    //Remove any host entries related to the file, if the file has no more hosts sharing it or can no longer provide all chunks will
+    //need to remove it or something.
+    printf("leave_request\n");    
     return 0;
 }

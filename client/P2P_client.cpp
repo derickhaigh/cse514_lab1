@@ -45,9 +45,8 @@ int main(int argc, char const *argv[])
     strcpy(files,argv[3]);
 
 //Get host IP from the hostname
-    char* hostname = SERVER_HOSTNAME;
     char ip[100];
-    if(host_lookup(hostname,ip) < 0){
+    if(host_lookup(server_host,ip) < 0){
         perror("Error in host lookup");
         exit(EXIT_FAILURE);
     }
@@ -176,11 +175,7 @@ void send_reg_req(char* files, uint16_t port, int sock){
 
     closedir(p_dir);
 
-    //Debug, iterate through hash table for file entries
-    std::map<std::string,uint32_t>::iterator itr;/*
-    for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
-        std::cout<<itr->first<<": "<<itr->second<<std::endl;        
-    }*/
+  
 
     //Have the file registery, send the message
     std::cout<<sizeof(file_registry)<<std::endl;
@@ -224,6 +219,7 @@ void send_reg_req(char* files, uint16_t port, int sock){
     curr_entry=&(((char*) curr_entry)[5]);
 
     //Start placing the file name/size pairs
+    std::map<std::string,uint32_t>::iterator itr;    
     for(itr = file_registry.begin(); itr != file_registry.end(); itr++){
         std::cout<<itr->first<<": "<<itr->second<<std::endl;
         //Enter size of string
@@ -245,13 +241,6 @@ void send_reg_req(char* files, uint16_t port, int sock){
     }
 
 
-    //Set a point right after the message type marker
-/*    void* reg_buff_msg = &(((uint8_t*) reg_buff)[1]);
-    ((register_request *) reg_buff_msg)[0].num_files=reg_req.num_files;
-    ((register_request *) reg_buff_msg)[0].requester_ip=reg_req.requester_ip;
-    ((register_request *) reg_buff_msg)[0].requester_port=reg_req.requester_port;
-    ((register_request *) reg_buff_msg)[0].files_lengths=reg_req.files_lengths;
-*/
     send_message("Server1",8080,(char*)reg_buff, reg_buff_size, sock);
 
 
