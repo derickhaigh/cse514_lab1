@@ -95,6 +95,7 @@ int main(int argc, char const *argv[])
 } 
 
 int menu_prompt(){
+    //This would eventually determine the next request being sent
     int choice = 0;
     while(choice < 1 || choice > 3){
         printf("1) List Available Files\n2) Download File\n3) View Active Downloads\n");
